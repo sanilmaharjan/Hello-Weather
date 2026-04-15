@@ -101,16 +101,22 @@ const WeatherDashboard = () => {
   };
 
   const initFetch = () => {
+    setLoading(true);
+    setError(null);
     if (query) {
       fetchWeather(query);
     } else {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => fetchWeather(null, pos.coords.latitude, pos.coords.longitude),
-          () => fetchWeather("Kathmandu") // Fallback if user blocks location
+          () => {
+            setLoading(false);
+            setError("Location access denied. Please search for a city using the bar above.");
+          }
         );
       } else {
-        fetchWeather("Kathmandu");
+        setLoading(false);
+        setError("Geolocation is not supported by your browser. Please search for a city above.");
       }
     }
   };
@@ -152,8 +158,9 @@ const WeatherDashboard = () => {
           </p>
           <button 
             onClick={handleRetry}
-            className="bg-white/30 hover:bg-white/40 transition-colors text-white font-medium text-sm px-6 py-2 rounded-md flex items-center gap-2"
+            className="bg-white/30 hover:bg-white/40 transition-colors text-white font-medium text-sm px-6 py-2 rounded-md flex items-center gap-2 pointer-events-none opacity-50 hidden"
           >
+            {/* Hidden retry button when error is handled manually */}
             <RefreshCcw className="w-4 h-4" />
             Attempt Reconnection
           </button>
@@ -169,8 +176,8 @@ const WeatherDashboard = () => {
       animate="show"
       className="p-8 max-w-6xl mx-auto space-y-12 pb-24"
     >
-      <motion.div variants={itemVariants} className="w-full bg-white rounded-xl border border-[#4A90E2] flex flex-col md:flex-row overflow-hidden">
-        <div className="p-8 md:w-1/2 flex flex-col justify-start">
+      <motion.div variants={itemVariants} className="w-full bg-white rounded-xl border border-[#4A90E2] flex flex-col md:flex-row overflow-hidden relative">
+        <div className="p-8 md:w-1/2 flex flex-col justify-start z-10">
           <div className="flex items-center gap-2 mb-1">
             <MapPin className="text-[#4A90E2] w-6 h-6" strokeWidth={2.5} />
             <h2 className="text-3xl font-extrabold text-[#78889B]">{weatherData?.city}</h2>
@@ -185,8 +192,12 @@ const WeatherDashboard = () => {
         
         <div className="md:w-1/2 relative min-h-[250px] p-8 flex items-center justify-center">
           <div 
-            className="absolute inset-0 bg-no-repeat bg-cover bg-center opacity-90 scale-125"
-            style={{ backgroundImage: `url(${cloudImg})`, backgroundSize: '70%', backgroundPosition: 'center' }}
+            className="absolute inset-0 bg-no-repeat pointer-events-none opacity-[0.85]"
+            style={{ 
+              backgroundImage: `url(${cloudImg})`, 
+              backgroundSize: '140%', 
+              backgroundPosition: 'right 40%' 
+            }}
           />
 
           <div className="relative z-10 grid grid-cols-2 gap-y-12 gap-x-16 text-center w-full max-w-sm">
