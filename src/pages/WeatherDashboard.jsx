@@ -158,9 +158,8 @@ const WeatherDashboard = () => {
           </p>
           <button 
             onClick={handleRetry}
-            className="bg-white/30 hover:bg-white/40 transition-colors text-white font-medium text-sm px-6 py-2 rounded-md flex items-center gap-2 pointer-events-none opacity-50 hidden"
+            className="bg-white/30 hover:bg-white/40 transition-colors text-white font-medium text-sm px-6 py-2 rounded-md flex items-center gap-2"
           >
-            {/* Hidden retry button when error is handled manually */}
             <RefreshCcw className="w-4 h-4" />
             Attempt Reconnection
           </button>
