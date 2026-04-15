@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import { Sun, Cloud, CloudRain, Snowflake, CloudLightning, Loader2, AlertTriangle, RefreshCcw, MapPin } from 'lucide-react';
+import { Sun, Cloud, CloudRain, Snowflake, CloudLightning, Loader2, AlertTriangle, RefreshCcw, MapPin, CloudSun, CloudDrizzle, CloudFog } from 'lucide-react';
 import cloudImg from '../assets/images/cloud.png';
 
 const WeatherDashboard = () => {
@@ -16,13 +16,20 @@ const WeatherDashboard = () => {
 
   const getWeatherIcon = (main) => {
     switch (main?.toLowerCase()) {
-      case 'clear': return <Sun className="text-[#8CC2FF] w-8 h-8 mb-4 hover:rotate-45 transition-transform duration-500" strokeWidth={1.5} />;
-      case 'clouds': return <Cloud className="text-gray-400 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />;
+      case 'clear': return <Sun className="text-amber-400 w-8 h-8 mb-4 hover:rotate-45 transition-transform duration-500 fill-amber-400/20" strokeWidth={2} />;
+      case 'mainly clear':
+      case 'partly cloudy': return <CloudSun className="text-orange-400 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500 fill-orange-300/20" strokeWidth={1.5} />;
+      case 'clouds':
+      case 'overcast': return <Cloud className="text-gray-400 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500 fill-gray-200/40" strokeWidth={1.5} />;
+      case 'fog': return <CloudFog className="text-gray-500 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />;
+      case 'drizzle': return <CloudDrizzle className="text-teal-400 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />;
       case 'rain':
-      case 'drizzle': return <CloudRain className="text-blue-500 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />;
-      case 'snow': return <Snowflake className="text-blue-200 w-8 h-8 mb-4 hover:rotate-90 transition-transform duration-500" strokeWidth={1.5} />;
-      case 'thunderstorm': return <CloudLightning className="text-yellow-500 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />;
-      default: return <Sun className="text-[#8CC2FF] w-8 h-8 mb-4 hover:rotate-45 transition-transform duration-500" strokeWidth={1.5} />;
+      case 'freezing rain':
+      case 'showers': return <CloudRain className="text-blue-500 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500 fill-blue-400/20" strokeWidth={1.5} />;
+      case 'snow':
+      case 'snow showers': return <Snowflake className="text-blue-200 w-8 h-8 mb-4 hover:rotate-90 transition-transform duration-500" strokeWidth={1.5} />;
+      case 'thunderstorm': return <CloudLightning className="text-indigo-500 w-8 h-8 mb-4 hover:scale-110 transition-transform duration-500 fill-indigo-400/20" strokeWidth={1.5} />;
+      default: return <Sun className="text-amber-400 w-8 h-8 mb-4 hover:rotate-45 transition-transform duration-500" strokeWidth={2} />;
     }
   };
 
@@ -59,13 +66,18 @@ const WeatherDashboard = () => {
 
       // Convert WMO standard codes to UI descriptors
       const getDesc = (code) => {
-        if (code <= 3) return 'Clear';
-        if (code <= 48) return 'Clouds';
-        if (code <= 67) return 'Rain';
-        if (code <= 77) return 'Snow';
-        if (code <= 82) return 'Rain';
-        if (code <= 86) return 'Snow';
-        if (code <= 99) return 'Thunderstorm';
+        if (code === 0) return 'Clear';
+        if (code === 1) return 'Mainly clear';
+        if (code === 2) return 'Partly cloudy';
+        if (code === 3) return 'Overcast';
+        if (code === 45 || code === 48) return 'Fog';
+        if (code >= 51 && code <= 55) return 'Drizzle';
+        if (code >= 61 && code <= 65) return 'Rain';
+        if (code >= 66 && code <= 67) return 'Freezing rain';
+        if (code >= 71 && code <= 77) return 'Snow';
+        if (code >= 80 && code <= 82) return 'Showers';
+        if (code >= 85 && code <= 86) return 'Snow showers';
+        if (code >= 95 && code <= 99) return 'Thunderstorm';
         return 'Clear';
       };
 
@@ -189,14 +201,11 @@ const WeatherDashboard = () => {
           </div>
         </div>
         
-        <div className="md:w-1/2 relative min-h-[250px] p-8 flex items-center justify-center">
-          <div 
-            className="absolute inset-0 bg-no-repeat pointer-events-none opacity-[0.85]"
-            style={{ 
-              backgroundImage: `url(${cloudImg})`, 
-              backgroundSize: '140%', 
-              backgroundPosition: 'right 40%' 
-            }}
+        <div className="md:w-1/2 relative min-h-[250px] p-8 flex items-center justify-center overflow-hidden">
+          <img 
+            src={cloudImg} 
+            alt="Cloud Background Layer" 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-contain pointer-events-none opacity-[0.85] z-0 scale-125" 
           />
 
           <div className="relative z-10 grid grid-cols-2 gap-y-12 gap-x-16 text-center w-full max-w-sm">
